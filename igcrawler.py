@@ -9,6 +9,7 @@ import time
 import os
 import wget
 
+import getpass
 def enterIg(usern,passw):
     PATH = r"C:\Users\user\Documents\crawler-selenium\chromedriver"
     # driver = webdriver.Chrome(PATH)
@@ -31,7 +32,7 @@ def enterIg(usern,passw):
     password.clear()
     username.send_keys(usern)
     password.send_keys(passw)
-    print("d")
+
     login = driver.find_element_by_xpath('//*[@id="loginForm"]/div/div[3]/button/div')
     login.click()
 
@@ -91,6 +92,7 @@ def likeusers(driver,path,keyword,count,storiesnum):
     try:
         # time.sleep(5)
         # people=driver.find_elements_by_css_selector('._7UhW9.xLCgt.qyrsm.KV-D4.fDxYl.T0kll')
+       
         people = WebDriverWait(driver, 10).until(
             EC.presence_of_all_elements_located((By.CSS_SELECTOR, "._7UhW9.xLCgt.qyrsm.KV-D4.fDxYl.T0kll"))
         )
@@ -106,7 +108,7 @@ def likeusers(driver,path,keyword,count,storiesnum):
         # time.sleep(5)                  
         # users=driver.find_elements_by_css_selector('._7UhW9.xLCgt.qyrsm.KV-D4.se6yk.T0kll')
         
-        time.sleep(3)
+        time.sleep(2)
         users = WebDriverWait(driver, 10).until(
             EC.presence_of_all_elements_located((By.CSS_SELECTOR, "._7UhW9.xLCgt.qyrsm.KV-D4.se6yk.T0kll"))
         )
@@ -154,23 +156,31 @@ def comment(driver,path,keyword,count):
 
     f = open(path+'\\'+keyword+str(count)+'.txt', 'w+',encoding='UTF-8')
     # users=driver.find_elements_by_css_selector('.sqdOP.yWX7d._8A5w5.ZIAjV')
+    time.sleep(2)
     users = WebDriverWait(driver, 10).until(
             EC.presence_of_all_elements_located((By.CSS_SELECTOR, ".sqdOP.yWX7d._8A5w5.ZIAjV"))
     )
-    comments=driver.find_elements_by_class_name("C4VMK")
+    # comments=driver.find_elements_by_class_name("C4VMK")
+    
+    comments = WebDriverWait(driver, 10).until(
+            EC.presence_of_all_elements_located((By.CLASS_NAME, "C4VMK"))
+    )
     # comments=driver.find_elements_by_css_selector('.Jv7Aj.mArmR.MqpiF')
-    for user in comments: 
-            f.write(user.get_attribute("textContent")+'\n')
+    i=1
+    for comment in comments: 
+            f.write(users[i].get_attribute("textContent")+':\n'+comment.get_attribute("textContent")+'\n')
+            i+=1
     f.write("\n")
-    for user in users: 
-            f.write(user.get_attribute("textContent")+'\n')
+    # for user in users: 
+    #         f.write(user.get_attribute("textContent")+'\n')
     # for num in range(len(users)): 
     #         f.write(users[num].get_attribute("textContent")+comments[num].get_attribute("textContent")+ '\n')
 
     
 def main():
     username = input("username: ")
-    password = input("password: ")
+    # password = input("password: ")
+    password = getpass.getpass("password: ")
     keyword = input("keyword: ")
 
     numscr = 1
