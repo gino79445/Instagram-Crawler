@@ -9,7 +9,7 @@ import time
 import os
 import wget
 
-def enterIg():
+def enterIg(usern,passw):
     PATH = r"C:\Users\user\Documents\crawler-selenium\chromedriver"
     # driver = webdriver.Chrome(PATH)
     options = webdriver.ChromeOptions() 
@@ -29,26 +29,26 @@ def enterIg():
 
     username.clear()
     password.clear()
-    username.send_keys('gino79445')
-    password.send_keys('a7944570a7944570')
-
+    username.send_keys(usern)
+    password.send_keys(passw)
+    print("d")
     login = driver.find_element_by_xpath('//*[@id="loginForm"]/div/div[3]/button/div')
     login.click()
 
     return driver
 
-def search(driver):
+def search(driver,keyword):
     search = WebDriverWait(driver, 10).until(
             EC.presence_of_element_located((By.XPATH, '//*[@id="react-root"]/section/nav/div[2]/div/div/div[2]/input'))
     )
 
-    keyword = 'mybosseatshit'
+    # keyword = 'mybosseatshit'
     search.send_keys(keyword)
     time.sleep(1)
     search.send_keys(Keys.RETURN)
     time.sleep(1)
     search.send_keys(Keys.RETURN)
-    return keyword
+    
 
 def downloadImg(driver,keyword,numscr):
     
@@ -169,9 +169,13 @@ def comment(driver,path,keyword,count):
 
     
 def main():
+    username = input("username: ")
+    password = input("password: ")
+    keyword = input("keyword: ")
+
     numscr = 1
-    driver = enterIg()
-    keyword = search(driver)
+    driver = enterIg(username,password)
+    search(driver,keyword)
     
     downloadImg(driver,keyword,numscr)
     # print(storiesNum(driver))
