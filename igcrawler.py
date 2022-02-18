@@ -11,7 +11,8 @@ import wget
 
 import getpass
 def enterIg(usern,passw):
-    PATH = r"C:\Users\user\Documents\crawler-selenium\chromedriver"
+    PATH = os.getcwd()+'\chromedriver.exe'
+    
     # driver = webdriver.Chrome(PATH)
     options = webdriver.ChromeOptions() 
     options.add_experimental_option("excludeSwitches", ["enable-logging"])
@@ -154,7 +155,7 @@ def userDetails(driver,keyword,numscr,storiesnum):
     
 def comment(driver,path,keyword,count):
 
-    f = open(path+'\\'+keyword+str(count)+'.txt', 'w+',encoding='UTF-8')
+    f = open(path+'\\'+keyword+str(count)+'.txt', 'w+',encoding='UTF-8',errors='ignore')
     # users=driver.find_elements_by_css_selector('.sqdOP.yWX7d._8A5w5.ZIAjV')
     time.sleep(2)
     users = WebDriverWait(driver, 10).until(
@@ -178,6 +179,7 @@ def comment(driver,path,keyword,count):
 
     
 def main():
+   
     username = input("username: ")
     # password = input("password: ")
     password = getpass.getpass("password: ")
