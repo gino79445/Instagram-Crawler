@@ -11,7 +11,7 @@ import wget
 
 import getpass
 def enterIg(usern,passw):
-    PATH = os.getcwd()+'\chromedriver.exe'
+    PATH = os.getcwd()+'\chromedriver'
     
     # driver = webdriver.Chrome(PATH)
     options = webdriver.ChromeOptions() 
@@ -198,4 +198,5 @@ def main():
     driver.close()
 
 if __name__ == '__main__':
+    print(os.getcwd())
     main()
