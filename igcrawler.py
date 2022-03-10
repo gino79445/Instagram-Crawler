@@ -11,11 +11,13 @@ import wget
 
 import getpass
 def enterIg(usern,passw):
-    PATH = r"C:\Users\user\Documents\crawler-selenium\chromedriver"
+    PATH = os.getcwd()+'\chromedriver'
+    
     # driver = webdriver.Chrome(PATH)
     options = webdriver.ChromeOptions() 
     options.add_experimental_option("excludeSwitches", ["enable-logging"])
     driver = webdriver.Chrome(options=options, executable_path=PATH)
+    driver.maximize_window()
     driver.get("https://www.instagram.com/")
     
 
@@ -42,6 +44,10 @@ def search(driver,keyword):
     search = WebDriverWait(driver, 10).until(
             EC.presence_of_element_located((By.XPATH, '//*[@id="react-root"]/section/nav/div[2]/div/div/div[2]/input'))
     )
+    # search = WebDriverWait(driver, 10).until(
+    #         EC.presence_of_element_located(By.CSS_SELECTOR, ".QY4Ed.P0xOK")
+    # )
+    
 
     # keyword = 'mybosseatshit'
     search.send_keys(keyword)
@@ -49,13 +55,16 @@ def search(driver,keyword):
     search.send_keys(Keys.RETURN)
     time.sleep(1)
     search.send_keys(Keys.RETURN)
-    
+
+def scroll(driver,numscr):
+    for i in range(numscr):
+        driver.execute_script("window.scrollTo(0,document.body.scrollHeight);")
+        time.sleep(2)
+   
 
 def downloadImg(driver,keyword,numscr):
     
-    for i in range(numscr):
-        driver.execute_script("window.scrollTo(0,document.body.scrollHeight);")
-        time.sleep(3)
+    scroll(driver,numscr)   
 
     WebDriverWait(driver, 10).until(
             EC.presence_of_element_located((By.CLASS_NAME, 'FFVAD'))
@@ -88,7 +97,7 @@ def storiesNum(driver):
     return storiesNum
 
 def likeusers(driver,path,keyword,count,storiesnum):
-    f = open(path+'\\'+keyword+str(count)+'.txt', 'w+')
+    f = open(path+'\\'+keyword+"likeuser"+str(count)+'.txt', 'w+')
     try:
         # time.sleep(5)
         # people=driver.find_elements_by_css_selector('._7UhW9.xLCgt.qyrsm.KV-D4.fDxYl.T0kll')
@@ -104,6 +113,7 @@ def likeusers(driver,path,keyword,count,storiesnum):
         people.click()
         f.write(people.get_attribute("textContent")+"\n")
         
+        
                  
         # time.sleep(5)                  
         # users=driver.find_elements_by_css_selector('._7UhW9.xLCgt.qyrsm.KV-D4.se6yk.T0kll')
@@ -112,7 +122,7 @@ def likeusers(driver,path,keyword,count,storiesnum):
         users = WebDriverWait(driver, 10).until(
             EC.presence_of_all_elements_located((By.CSS_SELECTOR, "._7UhW9.xLCgt.qyrsm.KV-D4.se6yk.T0kll"))
         )
-        
+    
         for user in users: 
             f.write(user.get_attribute("textContent")+'\n')
             # print(user.get_attribute("title"))
@@ -125,75 +135,156 @@ def likeusers(driver,path,keyword,count,storiesnum):
     f.close()
     
 
-            
-    driver.back()
-
-
 def userDetails(driver,keyword,numscr,storiesnum):
-    likeUsersPath  = os.path.join(keyword+"likeUsers")
-    os.mkdir(likeUsersPath)
-    commentUsersPath  = os.path.join(keyword+"commentUsers")
-    os.mkdir(commentUsersPath)
-
-    num = numscr*4 
+    
+    
     count = 0
-    for i in range(num):
-        for j in range(3):
-                front = '//*[@id="react-root"]/section/main/div/div[3]/article/div[1]/div/div['
-                mid = ']/div['
-                back = ']/a/div'
-                p = front +str(i+1)+mid +str(j+1)+back
-                link =driver.find_element_by_xpath(p)
-                link.click()
+    dictPath  = os.path.join(keyword)
+    os.mkdir(dictPath)
 
-                comment(driver,commentUsersPath,keyword,count)
-                likeusers(driver,likeUsersPath,keyword,count,storiesnum)
-                count+=1
+    # for i in range(num):
+    #     for j in range(3):
+    #         front = '//*[@id="react-root"]/section/main/div/div[3]/article/div[1]/div/div['
+    #         mid = ']/div['
+    #         back = ']/a/div'
+    #         p = front +str(i+1)+mid +str(j+1)+back
+    #         link =driver.find_element_by_xpath(p)
+    #         driver.execute_script("arguments[0].click();", link)
+    
+    
+    global links 
+    links =  WebDriverWait(driver, 10).until(
+         EC.presence_of_all_elements_located((By.CLASS_NAME, "_9AhH0"))
+    )
+    t=0
+    while(t<numscr):
+   
+        
+        try:
+            driver.execute_script("arguments[0].click();", links[t])
+        except:
+            scroll(driver,1)
+            newlinks = WebDriverWait(driver, 10).until(
+                 EC.presence_of_all_elements_located((By.CLASS_NAME, "_9AhH0"))
+            )
+            for element in newlinks:
+                if element not in links:
+                    links.append(element)
+
+            driver.execute_script("arguments[0].click();", links[t])
+
+      
+        time.sleep(2)
+    
+        try:
+
+            imgs = WebDriverWait(driver, 1).until(
+                EC.presence_of_all_elements_located((By.CSS_SELECTOR, ".eLAPa.kPFhm"))
+            )
             
+
+            img = imgs[0].find_element_by_class_name("FFVAD")
+            # print(img.get_attribute("src"))
+            dataPath = dictPath+'/'+keyword+str(count)
+            os.mkdir(dataPath)
+            save_as =os.path.join(dataPath,keyword + str(count)+'.jpg')
+
+            wget.download(img.get_attribute("src"),save_as)
+            
+            comment(driver,dataPath,keyword,count)
+            likeusers(driver,dataPath,keyword,count,storiesnum)
+        except:
+            try:
+            
+
+                imgs = WebDriverWait(driver, 1).until(
+                    EC.presence_of_all_elements_located((By.CSS_SELECTOR, ".eLAPa.RzuR0"))
+                )
+                img = imgs[0].find_element_by_class_name("FFVAD")
+                # print(img.get_attribute("src"))
+                dataPath = dictPath+'/'+keyword+str(count)
+                os.mkdir(dataPath)
+                save_as =os.path.join(dataPath,keyword + str(count)+'.jpg')
+
+                wget.download(img.get_attribute("src"),save_as)
+                
+                comment(driver,dataPath,keyword,count)
+                likeusers(driver,dataPath,keyword,count,storiesnum)
+            except:
+                print("other")
                 
     
-def comment(driver,path,keyword,count):
+        count+=1
+        t+=1
+        driver.back()
+       
 
-    f = open(path+'\\'+keyword+str(count)+'.txt', 'w+',encoding='UTF-8')
+        
+                
+                    
+    
+def comment(driver,path,keyword,count):
+ 
+    f = open(path+'\\'+keyword+"comment"+str(count)+'.txt', 'w+',encoding='UTF-8')
     # users=driver.find_elements_by_css_selector('.sqdOP.yWX7d._8A5w5.ZIAjV')
-    time.sleep(2)
+    # time.sleep(2)
+    
     users = WebDriverWait(driver, 10).until(
             EC.presence_of_all_elements_located((By.CSS_SELECTOR, ".sqdOP.yWX7d._8A5w5.ZIAjV"))
     )
-    # comments=driver.find_elements_by_class_name("C4VMK")
     
     comments = WebDriverWait(driver, 10).until(
-            EC.presence_of_all_elements_located((By.CLASS_NAME, "C4VMK"))
+            EC.presence_of_all_elements_located((By.CSS_SELECTOR, "._7UhW9.xLCgt.MMzan.KV-D4.se6yk.T0kll"))
     )
     # comments=driver.find_elements_by_css_selector('.Jv7Aj.mArmR.MqpiF')
+    likers = WebDriverWait(driver, 10).until(
+            EC.presence_of_all_elements_located((By.CSS_SELECTOR, "._7UhW9.PIoXz.qyrsm._0PwGv.uL8Hv.T0kll"))
+    )
+  
     i=1
+    er = 0
     for comment in comments: 
-            f.write(users[i].get_attribute("textContent")+':\n'+comment.get_attribute("textContent")+'\n')
+    
+            if i==1:
+                f.write(users[i].get_attribute("textContent")+':\n')
+                f.write(comment.get_attribute("textContent")+'\n\n')
+            else:
+                f.write(users[i].get_attribute("textContent")+':\n')
+                f.write("留言: "+comment.get_attribute("textContent")+'\n')
+                string = likers[(i-2)*2+er].get_attribute("textContent")
+                if string == "回覆":
+                    er=er - 1
+                    f.write("讚數: 0 \n")
+                else :
+                    f.write("讚數: "+string+'\n')
+            f.write("\n")
             i+=1
-    f.write("\n")
-    # for user in users: 
-    #         f.write(user.get_attribute("textContent")+'\n')
-    # for num in range(len(users)): 
-    #         f.write(users[num].get_attribute("textContent")+comments[num].get_attribute("textContent")+ '\n')
+    
+
 
     
 def main():
-    username = input("username: ")
+   
+    username = input("account: ")
     # password = input("password: ")
     password = getpass.getpass("password: ")
-    keyword = input("keyword: ")
+    keyword = input("search keyword: ")
 
-    numscr = 1
+    numscr = 10
     driver = enterIg(username,password)
+    
     search(driver,keyword)
     
-    downloadImg(driver,keyword,numscr)
+    # downloadImg(driver,keyword,numscr)
     # print(storiesNum(driver))
     storiesnum = storiesNum(driver)
     # loveNum(driver)
+    # for i in range(numscr):
+    #     scroll(driver,2)
+    #     userDetails(driver,keyword,numscr,storiesnum)
     userDetails(driver,keyword,numscr,storiesnum)
-    
     driver.close()
 
 if __name__ == '__main__':
+    
     main()
