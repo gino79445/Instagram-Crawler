@@ -235,23 +235,31 @@ def comment(driver,path,keyword,count):
     likers = WebDriverWait(driver, 10).until(
             EC.presence_of_all_elements_located((By.CSS_SELECTOR, "._7UhW9.PIoXz.qyrsm._0PwGv.uL8Hv.T0kll"))
     )
-  
+    
+    times = WebDriverWait(driver, 10).until(
+            EC.presence_of_all_elements_located((By.CSS_SELECTOR, ".FH9sR.RhOlS"))
+    )
+
     i=1
     er = 0
     for comment in comments: 
     
             if i==1:
                 f.write(users[i].get_attribute("textContent")+':\n')
-                f.write(comment.get_attribute("textContent")+'\n\n')
+                f.write(comment.get_attribute("textContent")+'\n')
+                f.write('日期: '+times[i-1].get_attribute("title")+'\n')
+                f.write('時間: '+times[i-1].get_attribute("datetime")+'\n')
             else:
                 f.write(users[i].get_attribute("textContent")+':\n')
                 f.write("留言: "+comment.get_attribute("textContent")+'\n')
                 string = likers[(i-2)*2+er].get_attribute("textContent")
                 if string == "回覆":
                     er=er - 1
-                    f.write("讚數: 0 \n")
+                    f.write("讚數: 0 個讚\n")
                 else :
                     f.write("讚數: "+string+'\n')
+                f.write('日期: '+times[i-1].get_attribute("title")+'\n')
+                f.write('時間: '+times[i-1].get_attribute("datetime")+'\n')
             f.write("\n")
             i+=1
     
