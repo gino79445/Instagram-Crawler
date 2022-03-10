@@ -218,11 +218,6 @@ def userDetails(driver,keyword,numscr,storiesnum):
         t+=1
         driver.back()
        
-
-        
-                
-                    
-    
 def comment(driver,path,keyword,count):
  
     f = open(path+'\\'+keyword+"comment"+str(count)+'.txt', 'w+',encoding='UTF-8')
@@ -276,12 +271,9 @@ def main():
     search(driver,keyword)
     
     # downloadImg(driver,keyword,numscr)
-    # print(storiesNum(driver))
+
     storiesnum = storiesNum(driver)
-    # loveNum(driver)
-    # for i in range(numscr):
-    #     scroll(driver,2)
-    #     userDetails(driver,keyword,numscr,storiesnum)
+
     userDetails(driver,keyword,numscr,storiesnum)
     driver.close()
 
