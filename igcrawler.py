@@ -119,13 +119,34 @@ def likeusers(driver,path,keyword,count,storiesnum):
         # users=driver.find_elements_by_css_selector('._7UhW9.xLCgt.qyrsm.KV-D4.se6yk.T0kll')
         
         time.sleep(2)
-        users = WebDriverWait(driver, 10).until(
-            EC.presence_of_all_elements_located((By.CSS_SELECTOR, "._7UhW9.xLCgt.qyrsm.KV-D4.se6yk.T0kll"))
-        )
-    
-        for user in users: 
-            f.write(user.get_attribute("textContent")+'\n')
-            # print(user.get_attribute("title"))
+        for i in range(20):
+            try :
+                users = WebDriverWait(driver, 10).until(
+                    EC.presence_of_all_elements_located((By.CSS_SELECTOR, "._7UhW9.xLCgt.qyrsm.KV-D4.se6yk.T0kll"))
+                )
+
+                for user in users: 
+                    f.write(user.get_attribute("textContent")+'\n')
+                    # print(user.get_attribute("title"))
+                area =  WebDriverWait(driver, 10).until(
+                    EC.presence_of_element_located((By.CSS_SELECTOR, ".qF0y9.Igw0E.IwRSH.eGOV_.vwCYk.i0EQd"))
+                )
+                area =   WebDriverWait(area, 10).until(
+                     EC.presence_of_all_elements_located((By.TAG_NAME, "div"))
+                )
+                area = area[0]
+               
+                driver.execute_script('arguments[0].scrollTop = arguments[0].scrollHeight;', area)
+        
+                # area.send_keys(Keys.PAGE_DOWN)
+                time.sleep(1)
+                
+            except:
+                print("error")
+                break
+
+
+        
     
     except:
         f.write("This is a vedio")
@@ -223,6 +244,18 @@ def comment(driver,path,keyword,count):
     f = open(path+'\\'+keyword+"comment"+str(count)+'.txt', 'w+',encoding='UTF-8')
     # users=driver.find_elements_by_css_selector('.sqdOP.yWX7d._8A5w5.ZIAjV')
     # time.sleep(2)
+    for i in range(3):
+        try :
+            next =  WebDriverWait(driver, 10).until(
+                EC.presence_of_element_located((By.CSS_SELECTOR, ".qF0y9.Igw0E.IwRSH.YBx95._4EzTm.NUiEW"))
+            )
+            # driver.execute_script("arguments[0].click();", next)
+            next.click()
+            next.click()
+            time.sleep(2)
+        except:
+            break
+                   
     
     users = WebDriverWait(driver, 10).until(
             EC.presence_of_all_elements_located((By.CSS_SELECTOR, ".sqdOP.yWX7d._8A5w5.ZIAjV"))
@@ -273,7 +306,7 @@ def main():
     password = getpass.getpass("password: ")
     keyword = input("search keyword: ")
 
-    numscr = 10
+    numscr = 5
     driver = enterIg(username,password)
     
     search(driver,keyword)
