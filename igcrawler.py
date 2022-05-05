@@ -1,4 +1,5 @@
 import random
+from cv2 import exp
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 # import pyautogui as pag
@@ -79,9 +80,9 @@ def downloadImg(driver):
             
         except:
             #多張照片第一章
-            imgs = WebDriverWait(driver, 2).until(
-                    EC.presence_of_all_elements_located((By.CSS_SELECTOR, ".eLAPa.RzuR0"))
-            )
+            # imgs = WebDriverWait(driver, 2).until(
+            #         EC.presence_of_all_elements_located((By.CSS_SELECTOR, ".eLAPa.RzuR0"))
+            # )
             pass
         
 
@@ -130,7 +131,7 @@ def likeusers(driver,path,keyword,count,storiesnum,people):
         lastlen =-1
         last = []
         ero = 0 
-        for i in range(0):
+        for i in range(5):
             lenusers = len(Users)
             # print(lenusers)
             
@@ -245,7 +246,7 @@ def userDetails(driver,keyword,numscr,storiesnum):
     count = 1
     dictPath  = os.path.join(keyword)
     os.mkdir(dictPath)
-    fq = open(dictPath+'\\'+'data5'+'.txt', 'w+',encoding='utf-8-sig')
+    # fq = open(dictPath+'\\'+'data5'+'.txt', 'w+',encoding='utf-8-sig')
     # 找每篇貼文連結
     global links 
     links =  WebDriverWait(driver, 10).until(
@@ -262,11 +263,17 @@ def userDetails(driver,keyword,numscr,storiesnum):
             action = ActionChains(driver)
             action.move_to_element(links[t]).perform()
             # n_like_elem = driver.find_elements_by_class_name('-V_eO')
-            n_like_elem = WebDriverWait(driver, 10).until(
-                 EC.presence_of_all_elements_located((By.CLASS_NAME, "-V_eO"))
-            )
-            likersnum = n_like_elem[0].text
-            commentsnum = n_like_elem[1].text
+            # 防止隱藏讚數、留言
+            try:
+                n_like_elem = WebDriverWait(driver, 3).until(
+                    EC.presence_of_all_elements_located((By.CLASS_NAME, "-V_eO"))
+                )
+                likersnum = n_like_elem[0].text
+                commentsnum = n_like_elem[1].text
+            except:
+                t=t+1
+                continue
+            
             # 點擊文章
             
             
@@ -290,11 +297,19 @@ def userDetails(driver,keyword,numscr,storiesnum):
             
             
             # n_like_elem = driver.find_elements_by_class_name('-V_eO')
-            n_like_elem = WebDriverWait(driver, 10).until(
-                 EC.presence_of_all_elements_located((By.CLASS_NAME, "-V_eO"))
-            )
-            likersnum = n_like_elem[0].text
-            commentsnum = n_like_elem[1].text
+            # 防止隱藏讚數、留言
+            try:
+                n_like_elem = WebDriverWait(driver, 3).until(
+                    EC.presence_of_all_elements_located((By.CLASS_NAME, "-V_eO"))
+                )
+                likersnum = n_like_elem[0].text
+                commentsnum = n_like_elem[1].text
+            except:
+                t=t+1
+                continue
+        
+           
+          
             
             # 點擊文章
             driver.execute_script("arguments[0].click();", links[t])
@@ -310,7 +325,7 @@ def userDetails(driver,keyword,numscr,storiesnum):
             dataPath = dictPath+'/'+keyword+str(count)
             if not os.path.isdir(dataPath):
                 a,b = compute(likersnum,commentsnum,count)
-                fq.write(str(b/a)+'\n')
+                # fq.write(str(b/a)+'\n')
                 os.mkdir(dataPath)
                 
             save_as =os.path.join(dataPath,keyword + str(count)+'.jpg')
@@ -342,7 +357,7 @@ def comment(driver,path,keyword,count,likesnum,commentsnum):
     # users=driver.find_elements_by_css_selector('.sqdOP.yWX7d._8A5w5.ZIAjV')
     # time.sleep(2)
 
-    for i in range(0):
+    for i in range(10):
         try :
             # 下滑留言
             
@@ -433,7 +448,8 @@ def main():
     password = getpass.getpass("password: ")
     keyword = input("search keyword: ")
 
-    numscr = 100
+    numscr  = input("The number of posts : ")
+    numscr = int(numscr)
     driver = enterIg(username,password)
     
     search(driver,keyword)
