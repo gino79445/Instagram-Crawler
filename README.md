@@ -21,8 +21,9 @@ The number of posts : 100
 5. [banai_design](https://www.instagram.com/banai_design/) (graphic)
 
 
-
 **Below is the box plot about the rate of comments to likes on 100 pictures at 5 different types of accounts:**
 <!-- ![box plot](https://github.com/gino79445/igcrawler/blob/master/box_plot.png?raw=true) -->
 <img src="https://github.com/gino79445/igcrawler/blob/master/box_plot.png?raw=true" style="width:700px" />
+
+*We can know the topic of meme is easy to make people comment.*
 
