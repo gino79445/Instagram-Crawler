@@ -1,4 +1,4 @@
-# Instagram Crawler
+# Instagram Crawler with selenium
 
 ### Below is what you can do with this program:
 + Get the information including who likes or comments, the number of likes or the image ... etc in each post of the account you are interested in.
