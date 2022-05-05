@@ -8,6 +8,7 @@
 account:your_account
 password:*******
 search keyword:mybosseatshit
+The number of posts : 100
 ```
 
 ### Below is the box plot about the rate of comments to likes on 100 pictures at 5 different types of accounts:
