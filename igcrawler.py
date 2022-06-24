@@ -1,5 +1,4 @@
 import random
-from cv2 import exp
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 # import pyautogui as pag
@@ -26,6 +25,7 @@ def enterIg(usern,passw):
     
     # driver = webdriver.Chrome(PATH)
     options = webdriver.ChromeOptions() 
+    # options.add_argument(r'--proxy--server=http:\\194.233.65.250:808')
     options.add_experimental_option("excludeSwitches", ["enable-logging"])
     driver = webdriver.Chrome(options=options, executable_path=PATH)
     driver.maximize_window()
@@ -57,9 +57,16 @@ def search(driver,keyword):
     )
     search.send_keys(keyword)
     time.sleep(1)
-    search.send_keys(Keys.RETURN)
-    time.sleep(1)
-    search.send_keys(Keys.RETURN)
+    # search.send_keys(Keys.RETURN)
+    # time.sleep(1)
+    # search.send_keys(Keys.RETURN)
+ 
+    links =  WebDriverWait(driver, 10).until(
+         EC.presence_of_all_elements_located((By.CSS_SELECTOR,"._7UhW9.xLCgt.MMzan._0PwGv.fDxYl"))
+    )
+    links[0].click()
+  
+    
 
 def scroll(driver,numscr):
     for i in range(numscr):
@@ -70,24 +77,25 @@ def scroll(driver,numscr):
 def downloadImg(driver):
     try:
         imgs = WebDriverWait(driver, 5).until(
-                EC.presence_of_all_elements_located((By.CSS_SELECTOR, ".eLAPa.kPFhm"))
+                EC.presence_of_all_elements_located((By.CSS_SELECTOR, "._aagu._aato"))
         )
     except:
-        try:
-            imgs = WebDriverWait(driver, 2).until(
-                EC.presence_of_all_elements_located((By.CSS_SELECTOR, ".kPFhm.Y8U6w.Uvt28"))
-            )
+        pass
+        # try:
+        #     imgs = WebDriverWait(driver, 2).until(
+        #         EC.presence_of_all_elements_located((By.CSS_SELECTOR, ".kPFhm.Y8U6w.Uvt28"))
+        #     )
             
-        except:
-            #多張照片第一章
-            # imgs = WebDriverWait(driver, 2).until(
-            #         EC.presence_of_all_elements_located((By.CSS_SELECTOR, ".eLAPa.RzuR0"))
-            # )
-            pass
+        # except:
+        #     #多張照片第一章
+        #     # imgs = WebDriverWait(driver, 2).until(
+        #     #         EC.presence_of_all_elements_located((By.CSS_SELECTOR, ".eLAPa.RzuR0"))
+        #     # )
+        #     pass
         
 
-    img = imgs[0].find_element_by_class_name("FFVAD")
-    # print(img.get_attribute("src"))
+    img = imgs[0].find_element_by_class_name("_aagt")
+    
     
     return img
     
@@ -97,15 +105,18 @@ def storiesNum(driver):
     # 算精選限時數量
     # time.sleep(3)
     # stories = driver.find_elements_by_class_name('mpzUq')
-    # try:
-    stories = WebDriverWait(driver, 10).until(
-            EC.presence_of_all_elements_located((By.CLASS_NAME, "mpzUq"))
-    )
-    storiesNum = 0
-    for storie in stories:
-     storiesNum+=1
-    # except:
-    #     storiesNum=-1
+    try:
+        # stories = WebDriverWait(driver, 10).until(
+        #         EC.presence_of_all_elements_located((By.CLASS_NAME, "mpzUq"))
+        # )
+        stories = WebDriverWait(driver, 10).until(
+                EC.presence_of_all_elements_located((By.CSS_SELECTOR, "._aacl._aaco._aacw._aacx._aada._aade"))
+        )
+        storiesNum = 0
+        for storie in stories:
+            storiesNum+=1
+    except:
+        storiesNum=0
     return storiesNum
 
 def likeusers(driver,path,keyword,count,storiesnum,people):
@@ -131,7 +142,7 @@ def likeusers(driver,path,keyword,count,storiesnum,people):
         lastlen =-1
         last = []
         ero = 0 
-        for i in range(5):
+        for i in range(1):
             lenusers = len(Users)
             # print(lenusers)
             
@@ -240,18 +251,23 @@ def compute(likersnum,commentsnum,count):
     print("totol comments = " +str(commentgol) +'\n' )
     return likergol , commentgol
 
-def userDetails(driver,keyword,numscr,storiesnum):
+def userDetails(driver,keyword,numscr,storiesnum,count):
     
     global people
-    count = 1
+    # for i in range(int((count+count/3)/12)):
+    #     scroll(driver,1)
     dictPath  = os.path.join(keyword)
+    numscr = numscr+count+int(count/4)
     os.mkdir(dictPath)
     # fq = open(dictPath+'\\'+'data5'+'.txt', 'w+',encoding='utf-8-sig')
     # 找每篇貼文連結
     global links 
-    links =  WebDriverWait(driver, 10).until(
-         EC.presence_of_all_elements_located((By.CLASS_NAME, "_9AhH0"))
-    )
+    # links =  WebDriverWait(driver, 10).until(
+    #      EC.presence_of_all_elements_located((By.CLASS_NAME, "_9AhH0"))
+    # )
+    links = WebDriverWait(driver, 3).until(
+                    EC.presence_of_all_elements_located((By.CSS_SELECTOR, "._aagu"))
+            )
     t=0
     # numscr為貼文篇數
     while(count<=numscr):
@@ -266,7 +282,7 @@ def userDetails(driver,keyword,numscr,storiesnum):
             # 防止隱藏讚數、留言
             try:
                 n_like_elem = WebDriverWait(driver, 3).until(
-                    EC.presence_of_all_elements_located((By.CLASS_NAME, "-V_eO"))
+                    EC.presence_of_all_elements_located((By.CLASS_NAME, "_abpm"))
                 )
                 likersnum = n_like_elem[0].text
                 commentsnum = n_like_elem[1].text
@@ -275,14 +291,21 @@ def userDetails(driver,keyword,numscr,storiesnum):
                 continue
             
             # 點擊文章
-            
+            if t<count-1:
+                t = t+1
+                continue
+
             
             driver.execute_script("arguments[0].click();", links[t])
         except:
+        
             # 如果發生錯誤，往下滑
             scroll(driver,1)
-            newlinks = WebDriverWait(driver, 10).until(
-                 EC.presence_of_all_elements_located((By.CLASS_NAME, "_9AhH0"))
+            # newlinks = WebDriverWait(driver, 10).until(
+            #      EC.presence_of_all_elements_located((By.CLASS_NAME, "_9AhH0"))
+            # )
+            newlinks = WebDriverWait(driver, 3).until(
+                    EC.presence_of_all_elements_located((By.CSS_SELECTOR, "._aagu"))
             )
             # 添加至links
             for element in newlinks:
@@ -300,7 +323,7 @@ def userDetails(driver,keyword,numscr,storiesnum):
             # 防止隱藏讚數、留言
             try:
                 n_like_elem = WebDriverWait(driver, 3).until(
-                    EC.presence_of_all_elements_located((By.CLASS_NAME, "-V_eO"))
+                    EC.presence_of_all_elements_located((By.CLASS_NAME, "_abpm"))
                 )
                 likersnum = n_like_elem[0].text
                 commentsnum = n_like_elem[1].text
@@ -309,10 +332,14 @@ def userDetails(driver,keyword,numscr,storiesnum):
                 continue
         
            
-          
+            if t<count-1:
+                t = t+1
+                continue
             
             # 點擊文章
             driver.execute_script("arguments[0].click();", links[t])
+
+            
 
       
      
@@ -332,8 +359,11 @@ def userDetails(driver,keyword,numscr,storiesnum):
             wget.download(imgPath.get_attribute("src"),save_as)
             
             # 抓按讚人
+            # people = WebDriverWait(driver, 10).until(
+            #     EC.presence_of_all_elements_located((By.CSS_SELECTOR, "._7UhW9.xLCgt.qyrsm.KV-D4.fDxYl.T0kll"))
+            # )
             people = WebDriverWait(driver, 10).until(
-                EC.presence_of_all_elements_located((By.CSS_SELECTOR, "._7UhW9.xLCgt.qyrsm.KV-D4.fDxYl.T0kll"))
+                EC.presence_of_all_elements_located((By.CSS_SELECTOR, "._aacl._aaco._aacw._aacx._aada._aade"))
             )
             people = people[storiesnum+1]
             try:
@@ -357,14 +387,14 @@ def comment(driver,path,keyword,count,likesnum,commentsnum):
     # users=driver.find_elements_by_css_selector('.sqdOP.yWX7d._8A5w5.ZIAjV')
     # time.sleep(2)
 
-    for i in range(10):
+    for i in range(1):
         try :
             # 下滑留言
             
             next =  WebDriverWait(driver, 5).until(
                 EC.presence_of_element_located((By.CSS_SELECTOR, ".qF0y9.Igw0E.IwRSH.YBx95._4EzTm.NUiEW"))
             )
-            sleep(random.uniform(1,2))
+            sleep(random.uniform(1.5,2))
             # driver.implicitly_wait(0)
             # driver.execute_script("arguments[0].click();", next)
             next.click()
@@ -374,75 +404,108 @@ def comment(driver,path,keyword,count,likesnum,commentsnum):
           
         except:
             break
+    # 抓取 user,comment,likers,times
+    f1 = open(path+'\\'+keyword+str(count)+'.csv', 'w+',encoding='utf-8-sig')
+    f1.write("author,content,like,comment,timestamp,url\n")
                    
     try:
-        # 抓取 user,comment,likers,times
+        
+
         users = WebDriverWait(driver, 2).until(
                 EC.presence_of_all_elements_located((By.CSS_SELECTOR, ".sqdOP.yWX7d._8A5w5.ZIAjV"))
         )
         
+        f1.write(users[0].get_attribute("textContent")+',')
+        
+
+    except:
+        print("user error\n")
+        f1.write("NONE"+',')
+
+   
+    try:
         comments = WebDriverWait(driver, 1).until(
                 EC.presence_of_all_elements_located((By.CSS_SELECTOR, "._7UhW9.xLCgt.MMzan.KV-D4.se6yk.T0kll"))
         )
+        if users[1].get_attribute("textContent") ==keyword:
+            f1.write(comments[0].get_attribute("textContent")+',')
+        else:
+            f1.write("NONE"+',')
+    except:
+        print("comments error\n")
+        f1.write("NONE"+',')
+
+    f1.write(likesnum+',')
+    f1.write(commentsnum+',')
+        
+    try:
         # comments=driver.find_elements_by_css_selector('.Jv7Aj.mArmR.MqpiF')
         likers = WebDriverWait(driver, 1).until(
                 EC.presence_of_all_elements_located((By.CSS_SELECTOR, "._7UhW9.PIoXz.qyrsm._0PwGv.uL8Hv.T0kll"))
         )
-        
+    except:
+        print("likers error\n")
+
+    try:    
         times = WebDriverWait(driver, 1).until(
                 EC.presence_of_all_elements_located((By.CSS_SELECTOR, ".FH9sR.RhOlS"))
         )
     except:
-        print("comment error")
+        print("times error\n")
+    try:
 
+        time = WebDriverWait(driver, 1).until(
+                EC.presence_of_all_elements_located((By.CLASS_NAME, "_1o9PC"))
+        )
+        
+        f1.write(time[0].get_attribute("datetime")+',')   
+    except:
+        print("time error\n")
+        f1.write("NONE"+',')
+
+   
+
+                
+    f1.write(driver.current_url+'\n')
+    f1.close()
+    # print(keyword)
+    # print(users[1].get_attribute("textContent"))
+    # print(users[1].get_attribute("textContent") ==keyword)
+    
     i=1
+        
     er = 0
     f = open(path+'\\'+keyword+"comment"+str(count)+'.csv', 'w+',encoding='utf-8-sig')
+    f.write("id,comment,like,timestamp\n")
     for comment in comments: 
             # 發文者,文章資訊
-            if i==1:
-                
-                f1 = open(path+'\\'+keyword+str(count)+'.csv', 'w+',encoding='utf-8-sig')
-                f1.write("author,content,like,comment,timestamp,url\n")
-                f1.write(users[i].get_attribute("textContent")+',')
-                f1.write(comment.get_attribute("textContent")+',')
-                # string = people.get_attribute("textContent")
-                # if "," in string:
-                #     string = string.replace(",", "")
-                # if "個讚" in string:
-                #     string = string.replace("個讚", "")
-                f1.write(likesnum+',')
-                f1.write(commentsnum+',')
-                f1.write(times[i-1].get_attribute("datetime")+',')               
-                f1.write(driver.current_url+'\n')
-                f1.close()
+    
+            # 留言者
+            
+            if users[1].get_attribute("textContent") ==keyword and i==1:
+                i=i+1
+                continue
 
-            else:
-                # 留言者
-                if i==2:
-                    f.write("id,comment,like,timestamp\n")
-
-                f.write(users[i].get_attribute("textContent")+',')
-                f.write(comment.get_attribute("textContent")+',')
-                string = likers[(i-2)*2+er].get_attribute("textContent")
-                if string == "回覆":
-                    er=er - 1
-                    f.write("0,")
-                else :
-                    if "," in string:
-                        string = string.replace(",", "")
-                    if "個讚" in string:
-                        string = string.replace("個讚", "")
-                    f.write(string+',')
-                f.write(times[i-1].get_attribute("datetime")+'\n')
-           
+            f.write(users[i].get_attribute("textContent")+',')
+            f.write(comment.get_attribute("textContent")+',')
+            string = likers[(i-2)*2+er].get_attribute("textContent")
+            if string == "回覆":
+                er=er - 1
+                f.write("0,")
+            else :
+                if "," in string:
+                    string = string.replace(",", "")
+                if "個讚" in string:
+                    string = string.replace("個讚", "")
+                f.write(string+',')
+            f.write(times[i-1].get_attribute("datetime")+'\n')
+    
             i+=1
     
-
-
-    
+ 
 def main():
    
+    
     username = input("account: ")
     # password = input("password: ")
     password = getpass.getpass("password: ")
@@ -450,6 +513,9 @@ def main():
 
     numscr  = input("The number of posts : ")
     numscr = int(numscr)
+
+    count  = input("the start post : ")
+    count = int(count)
     driver = enterIg(username,password)
     
     search(driver,keyword)
@@ -458,9 +524,9 @@ def main():
 
     storiesnum = storiesNum(driver)
 
-    userDetails(driver,keyword,numscr,storiesnum)
+    userDetails(driver,keyword,numscr,storiesnum,count)
     driver.close()
 
 if __name__ == '__main__':
     
-    main()
+        main()
